@@ -1,4 +1,4 @@
-package org.datanaliz.microarray;
+package org.datanaliz.expression;
 
 import org.datanaliz.Conf;
 
@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class GEOSeries extends RemoteDataAccessor
 {
-	protected final static String PLATFORM_LINE_INDICATOR = "!Series_platform_id";
+	protected final static String PLATFORM_LINE_INDICATOR = "!Series_platform_id\t";
 
 	protected final static String SERIES_URL_PREFIX =
 		"ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SeriesMatrix/";
@@ -74,7 +74,7 @@ public class GEOSeries extends RemoteDataAccessor
 		String header = line;
 
 		expSet = new ExpSet();
-		expSet.setExpname(header.substring(header.indexOf("\t")).replaceAll("\"", "").split("\t"));
+		expSet.setExpname(header.substring(header.indexOf("\t")+1).replaceAll("\"", "").split("\t"));
 		expSet.setName(id);
 
 		for(line = reader.readLine(); line != null; line = reader.readLine())
@@ -120,8 +120,8 @@ public class GEOSeries extends RemoteDataAccessor
 		{
 			if(currentLine.contains(PLATFORM_LINE_INDICATOR))
 			{
-				platformName = currentLine.substring(currentLine.indexOf("G"),
-					currentLine.lastIndexOf("\""));
+				platformName = currentLine.substring(
+					currentLine.indexOf("\t") + 1).replaceAll("\"", "");
 				break;
 			}
 		}

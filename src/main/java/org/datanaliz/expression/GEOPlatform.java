@@ -1,10 +1,8 @@
-package org.datanaliz.microarray;
+package org.datanaliz.expression;
 
 import org.datanaliz.Conf;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.*;
 
 /**
@@ -42,7 +40,6 @@ public class GEOPlatform extends RemoteDataAccessor
 
 		while (ignoreLine(line)) line = reader.readLine();
 
-		System.out.println("line = " + line);
 		String[] col = line.split("\t");
 
 		int egIndex = getColIndex(col, EG_NAMES);

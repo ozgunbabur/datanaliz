@@ -1,4 +1,4 @@
-package org.datanaliz.microarray;
+package org.datanaliz.expression;
 
 import org.junit.Test;
 

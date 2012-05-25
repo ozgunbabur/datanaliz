@@ -1,4 +1,4 @@
-package org.datanaliz.microarray;
+package org.datanaliz.expression;
 
 import org.datanaliz.conv.EntrezGene;
 import org.datanaliz.stat.Summary;
@@ -141,9 +141,22 @@ public class GeneExp
 		return Summary.max(val);
 	}
 	
+	public double[] getSubset(int[] ind)
+	{
+		double[] v = new double[ind.length];
+
+		for (int i = 0; i < ind.length; i++)
+		{
+			v[i] = val[ind[i]];
+		}
+		return v;
+	}
+	
 	@Override
 	public String toString()
 	{
-		return id + " | " + gb + " | " + getPrintable(symbols) + " | " + getPrintable(egIds);
+		return id + " | " + gb + " | " + 
+			(symbols == null ? "" : getPrintable(symbols)) + " | " +
+			(egIds == null ? "" : getPrintable(egIds));
 	}
 }

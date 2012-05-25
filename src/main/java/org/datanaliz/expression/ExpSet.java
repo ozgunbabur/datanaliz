@@ -1,4 +1,4 @@
-package org.datanaliz.microarray;
+package org.datanaliz.expression;
 
 import java.util.*;
 
@@ -14,6 +14,9 @@ public class ExpSet
 	String[] expname;
 	String name;
 
+	Map<String, String> exp2group;
+	Map<String, Set<String>> group2exp;
+	
 	public ExpSet()
 	{
 		id2gene = new HashMap<String, GeneExp>();
@@ -97,4 +100,43 @@ public class ExpSet
 			geneExp.unlog();
 		}
 	}
+	
+	public int indexOf(String expName)
+	{
+		for (int i = 0; i < expname.length; i++)
+		{
+			if (expname[i].equals(expName)) return i;
+		}
+		return -1;
+	}
+
+	public void setSubgroups(Map<String, String> exp2group)
+	{
+		this.exp2group = exp2group;
+
+		group2exp = new HashMap<String, Set<String>>();
+		for (String exp : exp2group.keySet())
+		{
+			String group = exp2group.get(exp);
+			if (!group2exp.containsKey(group)) group2exp.put(group, new HashSet<String>());
+			group2exp.get(group).add(exp);
+		}
+	}
+
+	public int[] getGroupIndex(String group)
+	{
+		assert group2exp.containsKey(group);
+
+		int[] ind = new int[group2exp.get(group).size()];
+
+		int i = 0;
+		for (String exp : group2exp.get(group))
+		{
+			ind[i++] = indexOf(exp);
+			assert ind[i-1] >= 0;
+		}
+		Arrays.sort(ind);
+		return ind;
+	}
+
 }

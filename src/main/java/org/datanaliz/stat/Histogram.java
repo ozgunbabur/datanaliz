@@ -268,7 +268,7 @@ public class Histogram
 		}
 	}
 
-	public void printTogether(Histogram h)
+	public void printTogether(Histogram h, boolean density)
 	{
 		if (binMap.isEmpty())
 		{
@@ -276,46 +276,8 @@ public class Histogram
 			return;
 		}
 
-		Integer[] bins = binMap.keySet().toArray(new Integer[binMap.size()]);
-		Arrays.sort(bins);
-		Integer[] hbins = h.binMap.keySet().toArray(new Integer[h.binMap.size()]);
-		Arrays.sort(hbins);
-
-		int min = Math.min(bins[0], hbins[0]);
-		int max = Math.max(bins[bins.length - 1], hbins[hbins.length - 1]);
-
-		for (int i = min; i <= max; i++)
-		{
-			System.out.print((i * range) + "\t");
-
-			if (binMap.containsKey(i))
-			{
-				System.out.print(binMap.get(i) + "\t");
-			}
-			else
-			{
-				System.out.print("0\t");
-			}
-
-			if (h.binMap.containsKey(i))
-			{
-				System.out.print(h.binMap.get(i) + "\n");
-			}
-			else
-			{
-				System.out.print("0\n");
-			}
-		}
-	}
-
-	public void printTogether(Histogram h, double times)
-	{
-		if (binMap.isEmpty())
-		{
-			h.print();
-			return;
-		}
-
+		assert h.range == range;
+		
 		Integer[] bins = binMap.keySet().toArray(new Integer[binMap.size()]);
 		Arrays.sort(bins);
 		Integer[] hbins = h.binMap.keySet().toArray(new Integer[h.binMap.size()]);
@@ -324,13 +286,16 @@ public class Histogram
 		int min = Math.min(bins[0], hbins[0]);
 		int max = Math.min(bins[bins.length - 1], hbins[hbins.length - 1]);
 
+		double div = total * range;
+		double hdiv = h.total * h.range;
+		
 		for (int i = min; i <= max; i++)
 		{
 			System.out.print((i * range) + "\t");
 
 			if (binMap.containsKey(i))
 			{
-				System.out.print((binMap.get(i) * times) + "\t");
+				System.out.print((density ? (binMap.get(i) / div) : binMap.get(i)) + "\t");
 			}
 			else
 			{
@@ -339,7 +304,7 @@ public class Histogram
 
 			if (h.binMap.containsKey(i))
 			{
-				System.out.print((h.binMap.get(i) * times) + "\n");
+				System.out.print((density ? (h.binMap.get(i) / hdiv) : h.binMap.get(i)) + "\n");
 			}
 			else
 			{
