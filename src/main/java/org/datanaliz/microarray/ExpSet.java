@@ -56,13 +56,45 @@ public class ExpSet
 		this.name = name;
 	}
 
-	public List<GeneExp> getBySymbol(String sm)
+	public List<GeneExp> get(String s)
 	{
-		return sm2gene.containsKey(sm) ? sm2gene.get(sm) : Collections.<GeneExp>emptyList();
+		return sm2gene.containsKey(s) ? sm2gene.get(s) :
+			eg2gene.containsKey(s) ? sm2gene.get(s) :
+				Collections.<GeneExp>emptyList();
 	}
 
-	public List<GeneExp> getByEG(String eg)
+	@Override
+	public String toString()
 	{
-		return eg2gene.containsKey(eg) ? sm2gene.get(eg) : Collections.<GeneExp>emptyList();
+		return name;
+	}
+	
+	public boolean isNatural()
+	{
+		Iterator<GeneExp> iter = id2gene.values().iterator();
+		int i = 0;
+		while (iter.hasNext())
+		{
+			if (i++ > 5) break;
+			GeneExp geneExp = iter.next();
+			if (geneExp.getMax() > 30) return true;
+		}
+		return false;
+	}
+
+	public void log()
+	{
+		for (GeneExp geneExp : id2gene.values())
+		{
+			geneExp.log();
+		}
+	}
+
+	public void unlog()
+	{
+		for (GeneExp geneExp : id2gene.values())
+		{
+			geneExp.unlog();
+		}
 	}
 }

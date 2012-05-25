@@ -71,10 +71,10 @@ public class GEOSeries extends RemoteDataAccessor
 		String line = reader.readLine();
 
 		while (ignoreLine(line)) line = reader.readLine();
-		String header = reader.readLine();
+		String header = line;
 
 		expSet = new ExpSet();
-		expSet.setExpname(header.substring(header.indexOf("\t")).split("\t"));
+		expSet.setExpname(header.substring(header.indexOf("\t")).replaceAll("\"", "").split("\t"));
 		expSet.setName(id);
 
 		for(line = reader.readLine(); line != null; line = reader.readLine())
@@ -82,12 +82,13 @@ public class GEOSeries extends RemoteDataAccessor
 			if (ignoreLine(line)) continue;
 
 			int tabIndex = line.indexOf("\t");
-			String id = line.substring(0, tabIndex);
+			String id = line.substring(0, tabIndex).replaceAll("\"", "");
 			line = line.substring(tabIndex + 1);
 			
 			GeneExp gene = new GeneExp(id);
 			gene.addEGIDs(plat.getEGIDs(gene.id));
 			gene.addSymbols(plat.getSymbols(gene.id));
+			gene.setGb(plat.getGB(gene.id));
 
 			if (wannaStore(gene)) 
 			{
@@ -95,6 +96,7 @@ public class GEOSeries extends RemoteDataAccessor
 				expSet.addGeneExp(gene);
 			}
 		}
+		if (expSet.isNatural()) expSet.log();
 	}
 
 	protected boolean ignoreLine(String line)

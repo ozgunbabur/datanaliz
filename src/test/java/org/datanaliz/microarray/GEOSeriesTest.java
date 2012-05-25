@@ -20,7 +20,7 @@ public class GEOSeriesTest
 
 		for (String s : filter)
 		{
-			for (GeneExp ge : expSet.getBySymbol(s))
+			for (GeneExp ge : expSet.get(s))
 			{
 				System.out.println("ge = " + ge);
 			}

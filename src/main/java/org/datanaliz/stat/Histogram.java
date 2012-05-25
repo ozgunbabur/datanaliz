@@ -44,6 +44,15 @@ public class Histogram
 		}
 	}
 
+	public Histogram(double range, double[] vals, int[] inds)
+	{
+		this(range);
+		for (int ind : inds)
+		{
+			count(vals[ind]);
+		}
+	}
+
 	public void setBordered(boolean bordered)
 	{
 		this.bordered = bordered;

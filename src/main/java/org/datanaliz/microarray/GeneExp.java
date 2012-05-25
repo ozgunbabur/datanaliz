@@ -1,6 +1,7 @@
 package org.datanaliz.microarray;
 
 import org.datanaliz.conv.EntrezGene;
+import org.datanaliz.stat.Summary;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,10 +13,13 @@ import java.util.List;
 public class GeneExp
 {
 	String id;
+	String gb;
 	List<String> egIds;
 	List<String> symbols;
 
 	double[] val;
+	
+	public static final double LOG2 = Math.log(2);
 
 	public GeneExp(String id, double[] val)
 	{
@@ -63,7 +67,6 @@ public class GeneExp
 		}
 	}
 
-
 	public void addEGID(String eg)
 	{
 		if (!egIds.contains(eg))
@@ -81,7 +84,28 @@ public class GeneExp
 			addEGID(eg);
 		}
 	}
+
+	private String getPrintable(List<String> list)
+	{
+		if (list.isEmpty()) return "";
+		String s = list.get(0);
+		for (int i = 1; i < list.size(); i++)
+		{
+			s += ", " + list.get(i);
+		}
+		return s;
+	}
 	
+	public String getGb()
+	{
+		return gb;
+	}
+
+	public void setGb(String gb)
+	{
+		this.gb = gb;
+	}
+
 	public boolean isAmong(Collection<String> coll)
 	{
 		for (String sm : symbols)
@@ -92,6 +116,34 @@ public class GeneExp
 		{
 			if (coll.contains(eg)) return true;
 		}
-		return false;
+
+		return (gb != null && coll.contains(gb));
+	}
+
+	public void log()
+	{
+		for (int i = 0; i < val.length; i++)
+		{
+			val[i] = Math.log(val[i]) / LOG2;
+		}
+	}
+	
+	public void unlog()
+	{
+		for (int i = 0; i < val.length; i++)
+		{
+			val[i] = Math.pow(2, val[i]);
+		}
+	}	
+	
+	public double getMax()
+	{
+		return Summary.max(val);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return id + " | " + gb + " | " + getPrintable(symbols) + " | " + getPrintable(egIds);
 	}
 }
