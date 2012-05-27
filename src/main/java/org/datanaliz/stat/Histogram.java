@@ -372,6 +372,41 @@ public class Histogram
 		}
 	}
 
+	public double[][] getDensity()
+	{
+		double[] minmax = getMinMax();
+
+		double[][] xy = new double[2][(int) (((minmax[1] - minmax[0]) / range) + 1)];
+		
+		String sep = "\t";
+
+		if (bordered)
+		{
+			xy[0][0] = minmax[0];
+			xy[1][0] = getDensity(minmax[0]) * range / (minmax[0] + (range / 2) - min);
+
+			int i = 1;
+			for (double x = minmax[0] + range; x <= minmax[1] - (range / 2); x += range)
+			{
+				xy[0][i] = x;
+				xy[1][i++] = getDensity(x);
+			}
+
+			xy[0][i] = minmax[1];
+			xy[1][i] = getDensity(minmax[1]) * range / (max - minmax[1] + (range / 2));
+		}
+		else
+		{
+			int i = 0;
+			for (double x = minmax[0]; x < minmax[1] + (range / 2); x += range)
+			{
+				xy[0][i] = x;
+				xy[1][i++] = getDensity(x);
+			}
+		}
+		return xy;
+	}
+
 	public static void write(Histogram h, String filename)
 	{
 		try

@@ -123,6 +123,27 @@ public class ExpSet
 		}
 	}
 
+	public boolean hasSubgroups()
+	{
+		return exp2group != null;
+	}
+	
+	public List<String> getSubgroups()
+	{
+		if (!hasSubgroups()) return Collections.emptyList();
+
+		List<String> groups = new ArrayList<String>(group2exp.keySet().size());
+		for (String exp : expname)
+		{
+			String group = exp2group.get(exp);
+			if (group != null && !groups.contains(group))
+			{
+				groups.add(group);
+			}
+		}
+		return groups;
+	}
+	
 	public int[] getGroupIndex(String group)
 	{
 		assert group2exp.containsKey(group);
@@ -139,4 +160,8 @@ public class ExpSet
 		return ind;
 	}
 
+	public Set<String> getSymbols()
+	{
+		return sm2gene.keySet();
+	}
 }

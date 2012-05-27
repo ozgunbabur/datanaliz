@@ -1,9 +1,12 @@
 package org.datanaliz.expression;
 
+import org.datanaliz.chart.XYChart;
+import org.datanaliz.stat.Histogram;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
 
 /**
  * @author Ozgun Babur
@@ -25,5 +28,10 @@ public class GEOSeriesTest
 				System.out.println("ge = " + ge);
 			}
 		}
+	}
+	
+	@Test
+	public void chart()
+	{
 	}
 }

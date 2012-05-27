@@ -48,7 +48,12 @@ public class GeneExp
 			val[i] = Double.parseDouble(valStr[i]);
 		}
 	}
-	
+
+	public double[] getValues()
+	{
+		return val;
+	}
+
 	public void addSymbol(String sym)
 	{
 		if (!symbols.contains(sym))
@@ -136,6 +141,11 @@ public class GeneExp
 		}
 	}	
 	
+	public boolean isLoged()
+	{
+		return getMax() < 30;
+	}
+	
 	public double getMax()
 	{
 		return Summary.max(val);
@@ -158,5 +168,40 @@ public class GeneExp
 		return id + " | " + gb + " | " + 
 			(symbols == null ? "" : getPrintable(symbols)) + " | " +
 			(egIds == null ? "" : getPrintable(egIds));
+	}
+	
+	public double variance()
+	{
+		return Summary.variance(val);
+	}
+
+	public double varLog()
+	{
+		return Summary.variance(getValuesLoged());
+	}
+	
+	public double varExped()
+	{
+		return Summary.variance(getValuesExped());
+	}
+	
+	public double[] getValuesLoged()
+	{
+		double[] v = new double[val.length];
+		for (int i = 0; i < v.length; i++)
+		{
+			v[i] = Math.log(val[i]) / LOG2;
+		}
+		return v;
+	}
+
+	public double[] getValuesExped()
+	{
+		double[] v = new double[val.length];
+		for (int i = 0; i < v.length; i++)
+		{
+			v[i] = Math.pow(2, val[i]);
+		}
+		return v;
 	}
 }
