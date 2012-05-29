@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Ozgun Babur
@@ -118,6 +119,8 @@ public class GEOSeries extends RemoteDataAccessor
 			{
 				download(new String[]{Conf.REMOTE_RESOURCE + id + Conf.GROUP_FILE_EXTENSION},
 					file.getPath());
+				
+				if (file.length() == 0) file.delete();
 			}
 			catch (IOException e)
 			{
@@ -126,7 +129,8 @@ public class GEOSeries extends RemoteDataAccessor
 		if (file.exists())
 		{
 			DelimFileParser p = new DelimFileParser(file.getPath());
-			expSet.setSubgroups(p.getOneToOneMap("Sample", "Group"));
+			Map<String,String> map = p.getOneToOneMap("Sample", "Group");
+			if (map.size() > 0) expSet.setSubgroups(map);
 		}
 	}
 	

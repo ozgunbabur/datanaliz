@@ -78,9 +78,9 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		// Upper combo boxes
 		
 		JPanel controlPanel = new JPanel(new BorderLayout());
-		controlPanel.setBackground(Color.PINK);
 
 		JPanel probePanel = new JPanel();
+		probePanel.setBackground(Color.WHITE);
 		probePanel.setBorder(new TitledBorder("Probeset"));
 		probeSetBox = new JComboBox();
 		probeModel = new DefaultComboBoxModel();
@@ -93,6 +93,7 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		if (expSet.hasSubgroups())
 		{
 			JPanel groupPanel = new JPanel(new FlowLayout());
+			groupPanel.setBackground(Color.WHITE);
 			int size = expSet.getExpname().length;
 			groupBorder = new TitledBorder("Group -- (" + size + "/" + size + ")");
 			groupPanel.setBorder(groupBorder);
@@ -116,6 +117,7 @@ public class ExpressionDistributionChart extends ApplicationFrame
 
 		group2sample = new HashMap<String, String>();
 		JPanel samplePanel = new JPanel(new FlowLayout());
+		samplePanel.setBackground(Color.WHITE);
 		samplePanel.setBorder(new TitledBorder("Sample"));
 		sampleModel = new DefaultComboBoxModel();
 		sampleBox = new JComboBox(sampleModel);
