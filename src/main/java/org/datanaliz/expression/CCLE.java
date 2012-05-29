@@ -9,9 +9,6 @@ import java.util.*;
  */
 public class CCLE extends MAS5Output
 {
-	Map<String, String> cell2tiss;
-	Map<String, Set<String>> tiss2cell;
-	
 	public CCLE()
 	{
 		this(null);
@@ -33,7 +30,7 @@ public class CCLE extends MAS5Output
 	protected void convertExpnamesToCellLines()
 	{
 		DelimFileParser p = new DelimFileParser(
-			this.getClass().getResource("CCLE_sample_info.txt").getFile());
+			this.getClass().getClassLoader().getResource("CCLE_sample_info.txt").getFile());
 
 		Map<String,String> map = p.getOneToOneMap("Expression arrays", "Cell line primary name");
 		String[] names = new String[expSet.getExpname().length];
@@ -48,10 +45,20 @@ public class CCLE extends MAS5Output
 	protected void readTissues()
 	{
 		DelimFileParser p = new DelimFileParser(
-			this.getClass().getResource("CCLE_sample_info.txt").getFile());
+			this.getClass().getClassLoader().getResource("CCLE_sample_info.txt").getFile());
 
 		expSet.setSubgroups(p.getOneToOneMap("Cell line primary name", "Site Primary"));
 	}
 
+	@Override
+	protected String getURL()
+	{
+		return "http://cbio.mskcc.org/~ozgun/" + id + ".txt.gz";
+	}
 
+	@Override
+	protected boolean isResourceZipped()
+	{
+		return true;
+	}
 }

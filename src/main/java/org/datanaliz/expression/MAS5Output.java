@@ -1,6 +1,7 @@
 package org.datanaliz.expression;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.Collection;
 
 /**
@@ -46,6 +47,7 @@ public abstract class MAS5Output extends GEOSeries
 	{
 		try
 		{
+			DecimalFormat df = new DecimalFormat("0.##");
 			BufferedReader reader = new BufferedReader(new FileReader(getFileName()));
 			BufferedWriter writer = new BufferedWriter(
 				new FileWriter(getFileName() + TMP_EXTENSION));
@@ -57,7 +59,21 @@ public abstract class MAS5Output extends GEOSeries
 
 			for (line = reader.readLine(); line != null; line = reader.readLine())
 			{
-				writer.write("\n" + line);
+				String[] token = line.split("\t");
+				writer.write("\n" + token[0]);
+
+				for (int i = 1; i < token.length; i++)
+				{
+					try
+					{
+						double v = Double.parseDouble(token[i]);
+						writer.write("\t" + df.format(v));
+					}
+					catch (NumberFormatException e)
+					{
+						writer.write("\t" + token[i]);
+					}
+				}
 			}
 
 			reader.close();

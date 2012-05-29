@@ -2,6 +2,8 @@ package org.datanaliz;
 
 import org.datanaliz.chart.ExpressionDistributionChart;
 import org.datanaliz.chart.XYChart;
+import org.datanaliz.expression.CCLE;
+import org.datanaliz.expression.ExpSet;
 import org.datanaliz.expression.GEOSeries;
 import org.datanaliz.stat.Histogram;
 import org.jfree.chart.demo.TimeSeriesChartDemo1;
@@ -27,8 +29,18 @@ public class Console
 	
 	private static void displayExpressionDensity(String dataset, List<String> sms)
 	{
-		GEOSeries series = new GEOSeries(dataset, sms);
-		ExpressionDistributionChart chart = new ExpressionDistributionChart(series.getExpSet());
+		ExpSet expSet;
+
+		if (dataset.equals("CCLE"))
+		{
+			expSet = new CCLE(sms).getExpSet();
+		}
+		else
+		{
+			expSet = new GEOSeries(dataset, sms).getExpSet();
+		}
+
+		ExpressionDistributionChart chart = new ExpressionDistributionChart(expSet);
 		chart.open();
 	}
 }

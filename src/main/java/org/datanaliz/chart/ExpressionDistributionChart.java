@@ -6,12 +6,15 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -29,11 +32,16 @@ public class ExpressionDistributionChart extends ApplicationFrame
 	JList geneList;
 	ChartPanel chartPanel;
 	JComboBox probeSetBox;
+	JComboBox sampleBox;
 	DefaultComboBoxModel probeModel;
 	DefaultComboBoxModel groupModel;
+	DefaultComboBoxModel sampleModel;
 	ProbesetListener probeListener;
+	SampleListener sampleListener;
 	Map<String, GeneExp> sm2ge;
-
+	Map<String, String> group2sample;
+	TitledBorder groupBorder;
+	
 	private static final String NONE = "None";
 	
 	/**
@@ -69,19 +77,25 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		
 		// Upper combo boxes
 		
-		JPanel controlPanel = new JPanel(new FlowLayout());
-		JLabel probeLabel = new JLabel("Probeset");
-		controlPanel.add(probeLabel);
+		JPanel controlPanel = new JPanel(new BorderLayout());
+		controlPanel.setBackground(Color.PINK);
+
+		JPanel probePanel = new JPanel();
+		probePanel.setBorder(new TitledBorder("Probeset"));
 		probeSetBox = new JComboBox();
 		probeModel = new DefaultComboBoxModel();
 		probeListener = new ProbesetListener();
 		probeSetBox.addActionListener(probeListener);
 		probeSetBox.setModel(probeModel);
-		controlPanel.add(probeSetBox);
+		probePanel.add(probeSetBox);
+		controlPanel.add(probePanel, BorderLayout.WEST);
+
 		if (expSet.hasSubgroups())
 		{
-			JLabel groupLab = new JLabel("   Group:");
-			controlPanel.add(groupLab);
+			JPanel groupPanel = new JPanel(new FlowLayout());
+			int size = expSet.getExpname().length;
+			groupBorder = new TitledBorder("Group -- (" + size + "/" + size + ")");
+			groupPanel.setBorder(groupBorder);
 			List<String> groups = expSet.getSubgroups();
 			groups.add(0, NONE);
 			JComboBox groupCombo = new JComboBox();
@@ -91,11 +105,25 @@ public class ExpressionDistributionChart extends ApplicationFrame
 			{
 				public void actionPerformed(ActionEvent e)
 				{
+					updateGroupTitle();
+					updateSamples();
 					updateChart();
 				}
 			});
-			controlPanel.add(groupCombo);
+			groupPanel.add(groupCombo);
+			controlPanel.add(groupPanel, BorderLayout.CENTER);
 		}
+
+		group2sample = new HashMap<String, String>();
+		JPanel samplePanel = new JPanel(new FlowLayout());
+		samplePanel.setBorder(new TitledBorder("Sample"));
+		sampleModel = new DefaultComboBoxModel();
+		sampleBox = new JComboBox(sampleModel);
+		sampleListener = new SampleListener();
+		updateSamples();
+		samplePanel.add(sampleBox);
+		controlPanel.add(samplePanel, BorderLayout.EAST);
+
 		getContentPane().add(controlPanel, BorderLayout.NORTH);
 		
 		// Chart
@@ -152,19 +180,56 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		return item.toString();
 	}
 	
+	private String selectedSample()
+	{
+		Object item = sampleModel.getSelectedItem();
+		if (item == NONE || item == null) return null;
+		return item.toString();
+	}
+	
 	protected JFreeChart createChart()
 	{
 		GeneExp ge = selectedProbeset();
 		HistogramDataset hd = new HistogramDataset();
-		hd.setType(HistogramType.SCALE_AREA_TO_1);
-		hd.addSeries("All samples", ge.getValues(), 20);
+		hd.setType(HistogramType.FREQUENCY);
+		
+		String sample = selectedSample();
+		if (sample != null)
+		{
+			double v = ge.getValues()[expSet.indexOf(sample)];
+			hd.addSeries(sample, new double[]{v}, 1, Math.floor(v), Math.ceil(v));
+		}
+		
 		String group = selectedGroup();
+//		double min = Summary.min(ge.getValues());
+//		double max = Summary.max(ge.getValues());
 		if (group != null)
 		{
-			hd.addSeries(group, ge.getSubset(expSet.getGroupIndex(group)), 20);
+			hd.addSeries(group, ge.getSubset(expSet.getGroupIndex(group)), 19, 0, 19);
 		}
-		return ChartFactory.createHistogram("Distribution of Expression", "expression", "density",
-			hd, PlotOrientation.VERTICAL, true, true, true);
+		hd.addSeries("all samples", ge.getValues(), 19, 0, 19);
+		JFreeChart chart = ChartFactory.createHistogram("Distribution of Expression", "expression",
+			"frequency", hd, PlotOrientation.VERTICAL, true, true, true);
+
+		chart.getRenderingHints().put(RenderingHints.KEY_ANTIALIASING,
+			RenderingHints.VALUE_ANTIALIAS_ON);
+		XYPlot plot = chart.getXYPlot();
+		XYBarRenderer renderer = (XYBarRenderer) plot.getRenderer();
+
+		int sampleIndex = sample != null ? 0 : -1;
+		int groupIndex = group == null ? -1 : sample == null ? 0 : 1;
+		int allIndex = Math.max(sampleIndex, groupIndex) + 1;
+
+		if (sampleIndex >= 0)
+		{
+			renderer.setSeriesPaint(sampleIndex, Color.YELLOW);
+			renderer.setSeriesOutlinePaint(sampleIndex, Color.BLACK);
+		}
+		if (groupIndex >= 0) renderer.setSeriesPaint(groupIndex, Color.RED);
+		renderer.setSeriesPaint(allIndex, Color.BLUE);
+		renderer.setShadowVisible(true);
+		renderer.setDrawBarOutline(true);
+		return chart;
 	}
 	
 	private void updateProbesets(String sm)
@@ -184,6 +249,47 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		chartPanel.setChart(createChart());
 	}
 
+	private void updateGroupTitle()
+	{
+		int total = expSet.getExpname().length;
+		String group = selectedGroup();
+		int sub = group == null ? total : expSet.getSubgroupSize(group);
+		
+		groupBorder.setTitle("Group -- (" + sub + "/" + total + ")");
+	}
+
+	private void updateSamples()
+	{
+		String sample = selectedSample();
+		sampleBox.removeActionListener(sampleListener);
+		String group = selectedGroup();
+		List<String> exps = new ArrayList<String>();
+		if (group == null)
+		{
+			exps.addAll(Arrays.asList(expSet.getExpname()));
+		}
+		else
+		{
+			exps.addAll(expSet.getSubgroup(group));
+		}
+		exps.add(0, NONE);
+		sampleModel.removeAllElements();
+		for (String exp : exps)
+		{
+			sampleModel.addElement(exp);
+		}
+		if (group != null && group2sample.containsKey(group))
+		{
+			sampleModel.setSelectedItem(group2sample.get(group));
+		}
+		else if (sample != null && (group == null || expSet.getSubgroup(group).contains(sample)))
+		{
+			sampleModel.setSelectedItem(sample);
+		}
+
+		sampleBox.addActionListener(sampleListener);
+	}
+	
 	public void open()
 	{
 		init();
@@ -197,6 +303,21 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		public void actionPerformed(ActionEvent e)
 		{
 //			sm2ge.put(selectedSymbol(), selectedProbeset());
+			updateChart();
+		}
+	}
+	class SampleListener implements ActionListener
+	{
+		public void actionPerformed(ActionEvent e)
+		{
+			String group = selectedGroup();
+			String sample = selectedSample();
+			if (group != null)
+			{
+				if (sample == null) group2sample.remove(group);
+				else group2sample.put(group, sample);
+			}
+
 			updateChart();
 		}
 	}

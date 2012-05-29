@@ -113,6 +113,7 @@ public class ExpSet
 	public void setSubgroups(Map<String, String> exp2group)
 	{
 		this.exp2group = exp2group;
+		cleanNonExistingExpInGroups();
 
 		group2exp = new HashMap<String, Set<String>>();
 		for (String exp : exp2group.keySet())
@@ -123,6 +124,14 @@ public class ExpSet
 		}
 	}
 
+	protected void cleanNonExistingExpInGroups()
+	{
+		for (String exp : new HashSet<String>(exp2group.keySet()))
+		{
+			if (indexOf(exp) < 0) exp2group.remove(exp);
+		}
+	}
+	
 	public boolean hasSubgroups()
 	{
 		return exp2group != null;
@@ -131,6 +140,8 @@ public class ExpSet
 	public List<String> getSubgroups()
 	{
 		if (!hasSubgroups()) return Collections.emptyList();
+
+		// Below lines ensure that groups will be in the order of appearance of samples.
 
 		List<String> groups = new ArrayList<String>(group2exp.keySet().size());
 		for (String exp : expname)
@@ -144,6 +155,31 @@ public class ExpSet
 		return groups;
 	}
 	
+	public List<String> getSubgroup(String group)
+	{
+		if (!hasSubgroups() || !group2exp.containsKey(group)) return Collections.emptyList();
+
+		// Below lines ensure that groups will be in the order of appearance of samples.
+
+		List<String> elements = new ArrayList<String>(group2exp.get(group).size());
+		for (String exp : expname)
+		{
+			String gr = exp2group.get(exp);
+			if (gr != null && gr.equals(group))
+			{
+				elements.add(exp);
+			}
+		}
+		return elements;
+	}
+	
+	public int getSubgroupSize(String group)
+	{
+		if (group2exp.containsKey(group)) return group2exp.get(group).size();
+		return 0;
+	}
+
+
 	public int[] getGroupIndex(String group)
 	{
 		assert group2exp.containsKey(group);

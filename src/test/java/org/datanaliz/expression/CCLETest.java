@@ -1,5 +1,6 @@
 package org.datanaliz.expression;
 
+import org.datanaliz.chart.ExpressionDistributionChart;
 import org.datanaliz.stat.Histogram;
 import org.junit.Test;
 
@@ -14,26 +15,16 @@ public class CCLETest
 	@Test
 	public void loadTestCCLE()
 	{
+	}
+
+	public static void main(String[] args)
+	{
 		Collection<String> filter = Arrays.asList(GENE_NAMES_1.split("\n"));
 		CCLE ccle = new CCLE(filter);
 		ExpSet expSet = ccle.getExpSet();
-		int[] melInd = expSet.getGroupIndex("skin");
-		System.out.println(melInd.length);
-
-		for (String s : filter)
-		{
-			for (GeneExp ge : expSet.get(s))
-			{
-				System.out.println("\n" + ge);
-
-				Histogram h1 = new Histogram(0.5, ge.val);
-				Histogram h2 = new Histogram(0.5, ge.getSubset(melInd));
-
-				h1.printTogether(h2, true);
-			}
-		}
+		ExpressionDistributionChart chart = new ExpressionDistributionChart(expSet);
+		chart.open();
 	}
-	
 	private static final String GENE_NAMES_1 =
 		"EIF4EBP1\n" +
 		"RB1\n" +
