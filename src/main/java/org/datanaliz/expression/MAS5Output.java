@@ -26,7 +26,7 @@ public abstract class MAS5Output extends GEOSeries
 	public abstract String getPlatform();
 
 	@Override
-	protected String getURL()
+	protected String[] getURL()
 	{
 		throw new UnsupportedOperationException("Cannot download this mas5 output from a URL");
 	}

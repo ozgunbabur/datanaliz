@@ -99,9 +99,9 @@ public class GEOPlatform extends RemoteDataAccessor
 	}
 
 	@Override
-	protected String getURL()
+	protected String[] getURL()
 	{
-		return PLATFORM_URL_PREFIX + id;
+		return new String[]{PLATFORM_URL_PREFIX + id};
 	}
 
 	@Override

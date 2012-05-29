@@ -1,5 +1,6 @@
 package org.datanaliz.expression;
 
+import org.datanaliz.Conf;
 import org.datanaliz.util.DelimFileParser;
 
 import java.util.*;
@@ -29,8 +30,8 @@ public class CCLE extends MAS5Output
 
 	protected void convertExpnamesToCellLines()
 	{
-		DelimFileParser p = new DelimFileParser(
-			this.getClass().getClassLoader().getResource("CCLE_sample_info.txt").getFile());
+		DelimFileParser p = new DelimFileParser(getClass().getResourceAsStream(
+			"CCLE_sample_info.txt"));
 
 		Map<String,String> map = p.getOneToOneMap("Expression arrays", "Cell line primary name");
 		String[] names = new String[expSet.getExpname().length];
@@ -44,16 +45,16 @@ public class CCLE extends MAS5Output
 
 	protected void readTissues()
 	{
-		DelimFileParser p = new DelimFileParser(
-			this.getClass().getClassLoader().getResource("CCLE_sample_info.txt").getFile());
+		DelimFileParser p = new DelimFileParser(getClass().getResourceAsStream(
+			"CCLE_sample_info.txt"));
 
 		expSet.setSubgroups(p.getOneToOneMap("Cell line primary name", "Site Primary"));
 	}
 
 	@Override
-	protected String getURL()
+	protected String[] getURL()
 	{
-		return "http://cbio.mskcc.org/~ozgun/" + id + ".txt.gz";
+		return new String[]{Conf.REMOTE_RESOURCE + id + ".txt.gz"};
 	}
 
 	@Override

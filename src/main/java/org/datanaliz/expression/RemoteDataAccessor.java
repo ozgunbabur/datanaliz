@@ -60,47 +60,75 @@ public abstract class RemoteDataAccessor
 	}
 
 	protected abstract void load() throws IOException;
-	protected abstract String getURL();
+	protected abstract String[] getURL();
 
 	protected abstract boolean isResourceZipped();
 
-	protected void download(String urlString, String filename) throws IOException
+	protected void download(String[] urlStrings, String filename) throws IOException
 	{
-		URL url = new URL(urlString);
-		URLConnection con = url.openConnection();
-
-		BufferedReader reader;
-		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-
-		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-		String currentRead;
-
-		while((currentRead = reader.readLine()) != null)
+		for (String urlString : urlStrings)
 		{
-			writer.write(currentRead + "\n");
+			try
+			{
+				System.out.print("Downloading data from " + urlString + " ... ");
+				URL url = new URL(urlString);
+				URLConnection con = url.openConnection();
+	
+				BufferedReader reader;
+				BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+	
+				reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+	
+				String currentRead;
+	
+				while((currentRead = reader.readLine()) != null)
+				{
+					writer.write(currentRead + "\n");
+				}
+	
+				reader.close();
+				writer.close();
+				System.out.println("ok");
+				break;
+			}
+			catch (IOException e)
+			{
+				System.out.println("failed!");
+			}
 		}
-
-		reader.close();
-		writer.close();
 	}
 
-	protected void downloadZipped(String urlString, String filename) throws IOException
+	protected void downloadZipped(String[] urlStrings, String filename) throws IOException
 	{
-		URL url = new URL(urlString);
-		URLConnection con = url.openConnection();
-
-		GZIPInputStream in = new GZIPInputStream(con.getInputStream());
-
-		// Open the output file
-		OutputStream out = new FileOutputStream(filename);
-
-		// Transfer bytes from the compressed file to the output file
-		byte[] buf = new byte[1024];
-		int len;
-		while ((len = in.read(buf)) > 0)
+		for (String urlString : urlStrings)
 		{
-			out.write(buf, 0, len);
+			try
+			{
+				System.out.print("Downloading compressed data from " + urlString + " ... ");
+				URL url = new URL(urlString);
+				URLConnection con = url.openConnection();
+		
+				GZIPInputStream in = new GZIPInputStream(con.getInputStream());
+		
+				// Open the output file
+				OutputStream out = new FileOutputStream(filename);
+		
+				// Transfer bytes from the compressed file to the output file
+				byte[] buf = new byte[1024];
+				int len;
+				while ((len = in.read(buf)) > 0)
+				{
+					out.write(buf, 0, len);
+				}
+				in.close();
+				out.close();
+				System.out.println("ok");
+				break;
+			}
+			catch (IOException e)
+			{
+				System.out.println("failed!");
+			}
 		}
 	}
 }

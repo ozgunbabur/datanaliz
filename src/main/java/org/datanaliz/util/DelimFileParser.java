@@ -1,9 +1,6 @@
 package org.datanaliz.util;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -26,6 +23,12 @@ public class DelimFileParser
 			e.printStackTrace();
 		}
 
+		delim = "\t";
+	}
+
+	public DelimFileParser(InputStream is)
+	{
+		this.reader = new BufferedReader(new InputStreamReader(is));
 		delim = "\t";
 	}
 
@@ -244,7 +247,7 @@ public class DelimFileParser
 				row[i] = token.trim();
 				if (row[i].startsWith("\"") && row[i].endsWith("\""))
 				{
-					row[i] = row[i].substring(1, row[i].length() - 1);
+					row[i] = row[i].substring(1, row[i].length() - 1).trim();
 				}
 			}
 

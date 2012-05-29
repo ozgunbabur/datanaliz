@@ -1,6 +1,7 @@
 package org.datanaliz.expression;
 
 import org.datanaliz.Conf;
+import org.datanaliz.util.DelimFileParser;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,10 +48,11 @@ public class GEOSeries extends RemoteDataAccessor
 	}
 
 	@Override
-	protected String getURL()
+	protected String[] getURL()
 	{
-		return SERIES_URL_PREFIX + (id.contains("-") ? id.substring(0, id.indexOf("-")) : id) +
-			"/"+ id + SERIES_URL_SUFFIX;
+		return new String[]{SERIES_URL_PREFIX + (id.contains("-") ? 
+				id.substring(0, id.indexOf("-")) : id) + "/"+ id + SERIES_URL_SUFFIX,
+			Conf.REMOTE_RESOURCE + id + ".txt.gz"};
 	}
 
 	@Override
@@ -97,6 +99,8 @@ public class GEOSeries extends RemoteDataAccessor
 			}
 		}
 		if (expSet.isNatural()) expSet.log();
+
+		loadSubgroups();
 	}
 
 	protected boolean ignoreLine(String line)
@@ -105,6 +109,27 @@ public class GEOSeries extends RemoteDataAccessor
 			line.startsWith("#") || line.trim().length() == 0;
 	}
 
+	protected void loadSubgroups()
+	{
+		File file = new File(Conf.DATA_FOLDER + File.separator +  id + Conf.GROUP_FILE_EXTENSION);
+		if (!file.exists())
+		{
+			try
+			{
+				download(new String[]{Conf.REMOTE_RESOURCE + id + Conf.GROUP_FILE_EXTENSION},
+					file.getPath());
+			}
+			catch (IOException e)
+			{
+			}
+		}
+		if (file.exists())
+		{
+			DelimFileParser p = new DelimFileParser(file.getPath());
+			expSet.setSubgroups(p.getOneToOneMap("Sample", "Group"));
+		}
+	}
+	
 	protected String extractPlatformID() throws IOException
 	{
 		File gseFile = new File(getFileName());
