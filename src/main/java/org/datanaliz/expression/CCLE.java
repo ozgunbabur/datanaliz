@@ -10,14 +10,14 @@ import java.util.*;
  */
 public class CCLE extends MAS5Output
 {
-	public CCLE()
+	public CCLE(String id)
 	{
-		this(null);
+		this(id, null);
 	}
 
-	public CCLE(Collection<String> geneFilter)
+	public CCLE(String id, Collection<String> geneFilter)
 	{
-		super("CCLEExpData", geneFilter);
+		super(id, geneFilter);
 		convertExpnamesToCellLines();
 		readTissues();
 	}

@@ -20,7 +20,7 @@ public class CCLETest
 	public static void main(String[] args)
 	{
 		Collection<String> filter = Arrays.asList(GENE_NAMES_1.split("\n"));
-		CCLE ccle = new CCLE(filter);
+		CCLE ccle = new CCLE("CCLEPlusSKMELNormalized", filter);
 		ExpSet expSet = ccle.getExpSet();
 		ExpressionDistributionChart chart = new ExpressionDistributionChart(expSet);
 		chart.open();

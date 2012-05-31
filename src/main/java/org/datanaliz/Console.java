@@ -6,9 +6,11 @@ import org.datanaliz.expression.CCLE;
 import org.datanaliz.expression.ExpSet;
 import org.datanaliz.expression.GEOSeries;
 import org.datanaliz.stat.Histogram;
+import org.datanaliz.util.FileUtil;
 import org.jfree.chart.demo.TimeSeriesChartDemo1;
 import org.jfree.ui.RefineryUtilities;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,13 +18,27 @@ import java.util.Random;
 
 public class Console
 {
-	public static void main (String[] args)
+	public static void main (String[] args) throws IOException
 	{
+		String s = FileUtil.readFile(args[3]).
+			replace(",", " ").replace("|", " ");
+		System.out.println("s = " + s);
+
 		if (args.length > 0)
 		{
 			if (args[0].equals("expdist") && args.length > 2)
 			{
-				displayExpressionDensity(args[1], Arrays.asList(args).subList(2, args.length));
+				if (args[2].equals("-f") && args.length > 3)
+				{
+					displayExpressionDensity(args[1],
+						Arrays.asList(FileUtil.readFile(args[3]).
+							replace(",", " ").replace("|", " ").split("\\s+")));
+
+				}
+				else
+				{
+					displayExpressionDensity(args[1], Arrays.asList(args).subList(2, args.length));
+				}
 			}
 		}
 	}
@@ -31,9 +47,9 @@ public class Console
 	{
 		ExpSet expSet;
 
-		if (dataset.equals("CCLE"))
+		if (dataset.startsWith("CCLE"))
 		{
-			expSet = new CCLE(sms).getExpSet();
+			expSet = new CCLE(dataset, sms).getExpSet();
 		}
 		else
 		{

@@ -3,6 +3,9 @@ package org.datanaliz.util;
 import org.datanaliz.Conf;
 
 import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,13 +149,27 @@ public class FileUtil
 		writer.close();
 	}
 
+	public static String readFile(String path) throws IOException {
+		FileInputStream stream = new FileInputStream(new File(path));
+		try {
+			FileChannel fc = stream.getChannel();
+			MappedByteBuffer bb = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+			/* Instead of using default, pass in a decoder. */
+			return Charset.defaultCharset().decode(bb).toString();
+		}
+		finally {
+			stream.close();
+		}
+	}
+
+
 	public static void main(String[] args) throws IOException
 	{
 //		transpose("resource/expdata/expo/stages.txt",
 //			"resource/expdata/expo/stages.txt");
 //
-		String file = Conf.DATA_FOLDER + "/CCLEExpData.txt";
-		System.out.println("getLineNumber(file) = " + getLineNumber(file));
-//		printLines(file, 1,2);
+		String file = Conf.DATA_FOLDER + "/CCLEPlusSKMELNormalized.txt";
+//		System.out.println("getLineNumber(file) = " + getLineNumber(file));
+		printLines(file, 1,3);
 	}
 }

@@ -1,0 +1,19 @@
+#run this script using:
+#R --vanilla < MAS5RScript.txt > out &
+
+#If bioconductor affy package is not installed, uncomment following lines.
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("affy")
+
+library(affy)
+affy.data = ReadAffy()
+eset.mas5 = mas5(affy.data)
+
+exprSet.nologs = exprs(eset.mas5)
+exprSet = log(exprSet.nologs, 2)
+write.table(exprSet, file="mas5values.txt", quote=F, sep="\t")
+
+#If you want to generate calls file, uncomment following lines
+#data.mas5calls = mas5calls(affy.data)
+#data.mas5calls.calls = exprs(data.mas5calls)
+#write.table(data.mas5calls.calls, file="mas5calls.txt", quote=F, sep="\t")

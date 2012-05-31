@@ -2,6 +2,7 @@ package org.datanaliz.chart;
 
 import org.datanaliz.expression.ExpSet;
 import org.datanaliz.expression.GeneExp;
+import org.datanaliz.stat.Summary;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -194,22 +195,24 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		GeneExp ge = selectedProbeset();
 		HistogramDataset hd = new HistogramDataset();
 		hd.setType(HistogramType.FREQUENCY);
-		
+
+		double min = Summary.min(ge.getValues());
+		double max = Summary.max(ge.getValues());
+		int bins = 20;
+
 		String sample = selectedSample();
 		if (sample != null)
 		{
 			double v = ge.getValues()[expSet.indexOf(sample)];
-			hd.addSeries(sample, new double[]{v}, 1, Math.floor(v), Math.ceil(v));
+			hd.addSeries(sample, new double[]{v}, bins, min, max);
 		}
 		
 		String group = selectedGroup();
-//		double min = Summary.min(ge.getValues());
-//		double max = Summary.max(ge.getValues());
 		if (group != null)
 		{
-			hd.addSeries(group, ge.getSubset(expSet.getGroupIndex(group)), 19, 0, 19);
+			hd.addSeries(group, ge.getSubset(expSet.getGroupIndex(group)), bins, min, max);
 		}
-		hd.addSeries("all samples", ge.getValues(), 19, 0, 19);
+		hd.addSeries("all samples", ge.getValues(), bins, min, max);
 		JFreeChart chart = ChartFactory.createHistogram("Distribution of Expression", "expression",
 			"frequency", hd, PlotOrientation.VERTICAL, true, true, true);
 

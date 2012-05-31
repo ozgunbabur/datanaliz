@@ -81,10 +81,16 @@ public abstract class MAS5Output extends GEOSeries
 
 			File oldFile = new File(getFileName());
 			File newFile = new File(getFileName() + TMP_EXTENSION);
-			if (newFile.exists() && newFile.length() > oldFile.length())
+			if (newFile.exists() && newFile.length() > 0)
 			{
-				oldFile.delete();
-				newFile.renameTo(new File(getFileName()));
+				if (!oldFile.delete())
+				{
+					throw new RuntimeException("Cannot delete file " + oldFile.getPath());
+				}
+				if (!newFile.renameTo(new File(getFileName())))
+				{
+					throw new RuntimeException("Cannot rename file " + newFile.getPath());
+				}
 			}
 		} catch (IOException e) { throw new RuntimeException(e); }
 	}

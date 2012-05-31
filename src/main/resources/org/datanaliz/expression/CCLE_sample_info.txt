@@ -1000,3 +1000,8 @@ YKG1_CENTRAL_NERVOUS_SYSTEM	YKG1		F	central_nervous_system	glioma	astrocytoma_Gr
 YMB1_BREAST	YMB-1		F	breast	carcinoma	NS	Identical lines: ZR-75-1 and YMB-1 share high SNP identity	HSRRB	AGENT_p_NCLE_RNA6_HG-U133_Plus_2_H01_436482	PODIA_p_NCLE_DNAAffy7_GenomeWideSNP_6_A11_437574	yes	
 ZR751_BREAST	ZR-75-1		F	breast	carcinoma	ductal_carcinoma	Identical lines: ZR-75-1 and YMB-1 share high SNP identity	ATCC	MAKER_p_NCLE_RNA7_HG-U133_Plus_2_C04_454614	FIEFS_p_NCLE_DNA_Affy5_GenomeWideSNP_6_H09_410932	yes	yes
 ZR7530_BREAST	ZR-75-30		F	breast	carcinoma	ductal_carcinoma		ATCC	WATCH_p_NCLE_RNA8_HG-U133_Plus_2_B07_474632	BOWER_p_NCLE_DNAAffy8_GenomeWideSNP_6_E10_464710	yes	yes
+x	Malme-3M-2		x	skin	carcinoma	malignant_melanoma		Christine	SLUES_p_Rosen_Melanoma_RNA_2008_HT_HGU133A_96HTA_F10_401646	x	x	x
+x	SK-MEL-133		x	skin	carcinoma	malignant_melanoma		Christine	SLUES_p_Rosen_Melanoma_RNA_2008_HT_HGU133A_96HTA_E03_401802	x	x	x
+x	SK-MEL-105		x	skin	carcinoma	malignant_melanoma		Christine	SLUES_p_Rosen_Melanoma_RNA_2008_HT_HGU133A_96HTA_E05_401798	x	x	x
+x	SK-MEL-39		x	skin	carcinoma	malignant_melanoma		Christine	SLUES_p_Rosen_Melanoma_RNA_2008_HT_HGU133A_96HTA_E07_401794	x	x	x
+x	SK-MEL-19		x	skin	carcinoma	malignant_melanoma		Christine	SLUES_p_Rosen_Melanoma_RNA_2008_HT_HGU133A_96HTA_F05_401632	x	x	x

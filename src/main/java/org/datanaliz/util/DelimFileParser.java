@@ -45,11 +45,11 @@ public class DelimFileParser
 
 			String line = reader.readLine();
 
-//			while (line.startsWith("^") || line.startsWith("!") || line.startsWith("#") ||
-//				line.length() == 0);
-//			{
-//				line = reader.readLine();
-//			}
+			while (line.startsWith("^") || line.startsWith("!") || line.startsWith("#") ||
+				line.length() == 0)
+			{
+				line = reader.readLine();
+			}
 
 			columnCnt = count(line, delim) + 1;
 			String[] header = parseRow(line);

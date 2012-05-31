@@ -68,16 +68,16 @@ public abstract class RemoteDataAccessor
 	{
 		for (String urlString : urlStrings)
 		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+
 			try
 			{
 				System.out.print("Downloading data from " + urlString + " ... ");
 				URL url = new URL(urlString);
 				URLConnection con = url.openConnection();
-	
-				BufferedReader reader;
-				BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-	
-				reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+				BufferedReader reader = new BufferedReader(
+					new InputStreamReader(con.getInputStream()));
 	
 				String currentRead;
 	
@@ -94,6 +94,7 @@ public abstract class RemoteDataAccessor
 			catch (IOException e)
 			{
 				System.out.println("failed!");
+				writer.close();
 			}
 		}
 	}

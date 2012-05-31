@@ -155,6 +155,7 @@ public class GEOSeries extends RemoteDataAccessor
 			}
 		}
 
+		br.close();
 		return platformName;
 	}
 
