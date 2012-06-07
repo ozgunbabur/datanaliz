@@ -112,7 +112,7 @@ public class GEOPlatform extends RemoteDataAccessor
 
 	protected String getFileName()
 	{
-		return Conf.DATA_FOLDER + File.separator + id + ".txt";
+		return Conf.DATA_FOLDER + id + ".txt";
 	}
 
 	public List<String> getEGIDs(String id)

@@ -3,10 +3,7 @@ package org.datanaliz.expression;
 import org.datanaliz.Conf;
 import org.datanaliz.util.DelimFileParser;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collection;
 import java.util.Map;
 
@@ -27,6 +24,8 @@ public class GEOSeries extends RemoteDataAccessor
 
 	Collection<String> geneFilter;
 	
+	boolean multiFile;
+	
 	/**
 	 * @param id GEO series ID (GSEXXXX)
 	 */
@@ -39,21 +38,24 @@ public class GEOSeries extends RemoteDataAccessor
 	{
 		this.id = id;
 		this.geneFilter = geneFilter;
+		
+		multiFile = findIfMultiFile();
+		
 		init();
 	}
 
 	@Override
 	protected String getFileName()
 	{
-		return Conf.DATA_FOLDER + File.separator + id + ".txt";
+		return Conf.DATA_FOLDER + id + ".txt";
 	}
 
 	@Override
 	protected String[] getURL()
 	{
 		return new String[]{SERIES_URL_PREFIX + (id.contains("-") ? 
-				id.substring(0, id.indexOf("-")) : id) + "/"+ id + SERIES_URL_SUFFIX,
-			Conf.REMOTE_RESOURCE + id + ".txt.gz"};
+				id.substring(0, id.indexOf("-")) : id) + "/"+ id + SERIES_URL_SUFFIX};
+//			Conf.REMOTE_RESOURCE + id + ".txt.gz"};
 	}
 
 	@Override
@@ -62,6 +64,19 @@ public class GEOSeries extends RemoteDataAccessor
 		return true;
 	}
 
+	protected boolean findIfMultiFile()
+	{
+		for (String url : getURL())
+		{
+			if (url.startsWith(SERIES_URL_PREFIX) && !urlExists(url))
+			{
+				url = url.substring(0, url.lastIndexOf(".t")) + "-1.txt.gz";
+				if (urlExists(url)) return true;
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	protected void load() throws IOException
 	{
@@ -101,8 +116,11 @@ public class GEOSeries extends RemoteDataAccessor
 		}
 		if (expSet.isNatural()) expSet.log();
 
+		System.out.println("Size of dataset = " + expSet.expname.length);
 		loadSubgroups();
 	}
+
+
 
 	protected boolean ignoreLine(String line)
 	{
@@ -112,7 +130,7 @@ public class GEOSeries extends RemoteDataAccessor
 
 	protected void loadSubgroups()
 	{
-		File file = new File(Conf.DATA_FOLDER + File.separator +  id + Conf.GROUP_FILE_EXTENSION);
+		File file = new File(Conf.DATA_FOLDER + id + Conf.GROUP_FILE_EXTENSION);
 		if (!file.exists())
 		{
 			try
@@ -129,7 +147,7 @@ public class GEOSeries extends RemoteDataAccessor
 		if (file.exists())
 		{
 			DelimFileParser p = new DelimFileParser(file.getPath());
-			Map<String,String> map = p.getOneToOneMap("Sample", "Group");
+			Map<String, String[]> map = p.readInStringArrays();
 			if (map.size() > 0) expSet.setSubgroups(map);
 		}
 	}
@@ -167,5 +185,102 @@ public class GEOSeries extends RemoteDataAccessor
 	private boolean wannaStore(GeneExp ge)
 	{
 		return geneFilter == null || ge.isAmong(geneFilter);
+	}
+	
+	protected void downloadMultiFile() throws IOException
+	{
+		String url = getURL()[0];
+		url = url.substring(0, url.lastIndexOf(".t"));
+		
+		int i = 0;
+		while(downloadZipped(new String[]{url + "-" + (++i) + ".txt.gz"}, 
+			Conf.DATA_FOLDER + id + "-" + i + ".txt"));
+	}
+
+	@Override
+	protected void download() throws IOException
+	{
+		if (multiFile)
+		{
+			downloadMultiFile();
+			mergeMultiFile();
+		}
+		else
+		{
+			super.download();
+		}
+	}
+	
+	protected int getFileCount()
+	{
+		int i = 0;
+		while (new File(Conf.DATA_FOLDER + id + "-" + (++i) + ".txt").exists());
+		return i-1;
+	}
+	
+	protected void mergeMultiFile() throws IOException
+	{
+		System.out.print("Merging data files for " + id + " ... ");
+
+		int count = getFileCount();
+		if (count == 0) return;
+
+		BufferedReader[] reader = new BufferedReader[count];
+		for (int i = 0; i < count; i++)
+		{
+			reader[i] = new BufferedReader(new FileReader(
+				Conf.DATA_FOLDER + id + "-" + (i+1) + ".txt"));
+		}
+
+		String[] line = new String[count];
+
+		BufferedWriter writer = new BufferedWriter(new FileWriter(getFileName()));
+
+		for (int i = 0; i < count; i++)
+		{
+			do
+			{
+				line[i] = reader[i].readLine();
+				if (i == 0 && line[i].startsWith(PLATFORM_LINE_INDICATOR))
+				{
+					writer.write(line[i]);
+				}
+			}
+			while(ignoreLine(line[i]));
+		}
+
+		do
+		{
+			if (!ignoreLine(line[0]))
+			{
+				String id = line[0].substring(0, line[0].indexOf("\t"));
+
+				writer.write("\n" + id);
+
+				for (int i = 0; i < count; i++)
+				{
+					writer.write(line[i].substring(line[i].indexOf("\t")));
+
+					assert id.equals(line[i].substring(0, line[i].indexOf("\t")));
+				}
+			}
+
+			for (int i = 0; i < count; i++)
+			{
+				line[i] = reader[i].readLine();
+			}
+		}
+		while(line[0] != null);
+		
+
+		writer.close();
+		for (BufferedReader r : reader) r.close();
+
+		for (int i = 0; i < count; i++)
+		{
+			new File(Conf.DATA_FOLDER + id + "-" + (i+1) + ".txt").delete();
+		}
+
+		System.out.println("ok");
 	}
 }

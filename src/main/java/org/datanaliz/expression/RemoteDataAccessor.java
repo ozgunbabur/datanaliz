@@ -3,6 +3,7 @@ package org.datanaliz.expression;
 import org.datanaliz.Conf;
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
@@ -64,7 +65,7 @@ public abstract class RemoteDataAccessor
 
 	protected abstract boolean isResourceZipped();
 
-	protected void download(String[] urlStrings, String filename) throws IOException
+	protected boolean download(String[] urlStrings, String filename) throws IOException
 	{
 		for (String urlString : urlStrings)
 		{
@@ -89,7 +90,14 @@ public abstract class RemoteDataAccessor
 				reader.close();
 				writer.close();
 				System.out.println("ok");
-				break;
+
+				File file = new File(filename);
+				if (file.exists())
+				{
+					if (file.length() > 0) return true;
+					else if (!file.delete()) throw new RuntimeException(
+						"Cannot delete empty file " + file.getPath());
+				}
 			}
 			catch (IOException e)
 			{
@@ -97,9 +105,10 @@ public abstract class RemoteDataAccessor
 				writer.close();
 			}
 		}
+		return false;
 	}
 
-	protected void downloadZipped(String[] urlStrings, String filename) throws IOException
+	protected boolean downloadZipped(String[] urlStrings, String filename) throws IOException
 	{
 		for (String urlString : urlStrings)
 		{
@@ -108,7 +117,7 @@ public abstract class RemoteDataAccessor
 				System.out.print("Downloading compressed data from " + urlString + " ... ");
 				URL url = new URL(urlString);
 				URLConnection con = url.openConnection();
-		
+
 				GZIPInputStream in = new GZIPInputStream(con.getInputStream());
 		
 				// Open the output file
@@ -124,12 +133,37 @@ public abstract class RemoteDataAccessor
 				in.close();
 				out.close();
 				System.out.println("ok");
-				break;
+				
+				File file = new File(filename);
+				if (file.exists())
+				{
+					if (file.length() > 0) return true;
+					else if (!file.delete()) throw new RuntimeException(
+						"Cannot delete empty file " + file.getPath());
+				}
 			}
 			catch (IOException e)
 			{
 				System.out.println("failed!");
 			}
+		}
+		return false;
+	}
+	
+	protected static boolean urlExists(String url)
+	{
+		try
+		{
+			InputStream is = new URL(url).openConnection().getInputStream();
+			return is.read(new byte[1]) > 0;
+		}
+		catch (FileNotFoundException e)
+		{
+			return false;
+		}
+		catch (IOException e)
+		{
+			throw new RuntimeException(e);
 		}
 	}
 }

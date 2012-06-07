@@ -48,7 +48,13 @@ public class CCLE extends MAS5Output
 		DelimFileParser p = new DelimFileParser(getClass().getResourceAsStream(
 			"CCLE_sample_info.txt"));
 
-		expSet.setSubgroups(p.getOneToOneMap("Cell line primary name", "Site Primary"));
+		Map<String, String> one2one = p.getOneToOneMap("Cell line primary name", "Site Primary");
+		Map<String, String[]> one2many = new HashMap<String, String[]>();
+		for (String key : one2one.keySet())
+		{
+			one2many.put(key, new String[]{one2one.get(key)});
+		}
+		expSet.setSubgroups(one2many);
 	}
 
 	@Override

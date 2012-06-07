@@ -286,4 +286,26 @@ public class DelimFileParser
 
 		return i;
 	}
+	
+	public Map<String, String[]> readInStringArrays()
+	{
+		Map<String, String[]> map = new HashMap<String, String[]>();
+
+		try
+		{
+			for (String line = reader.readLine(); line != null; line = reader.readLine())
+			{
+				String id = line.substring(0, line.indexOf("\t")).trim();
+				String[] token = line.substring(line.indexOf("\t") + 1).trim().split("\t");
+				map.put(id, token);
+			}
+
+			reader.close();
+
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return map;
+	}
 }

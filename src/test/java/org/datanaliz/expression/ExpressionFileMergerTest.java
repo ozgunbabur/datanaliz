@@ -11,9 +11,9 @@ public class ExpressionFileMergerTest
 	public void mergeTest()
 	{
 		ExpressionFileMerger m = new ExpressionFileMerger();
-		boolean b = m.merge(Conf.DATA_FOLDER + File.separator + "CCLEExpData.txt",
-			Conf.DATA_FOLDER + File.separator + "SKMEL.txt",
-			Conf.DATA_FOLDER + File.separator + "CCLEPlusSKMEL.txt");
+		boolean b = m.merge(Conf.DATA_FOLDER + "CCLEExpData.txt",
+			Conf.DATA_FOLDER + "SKMEL.txt",
+			Conf.DATA_FOLDER + "CCLEPlusSKMEL.txt");
 		System.out.println("b = " + b);
 	}
 }

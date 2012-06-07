@@ -79,6 +79,7 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		// Upper combo boxes
 		
 		JPanel controlPanel = new JPanel(new BorderLayout());
+		controlPanel.setBackground(Color.WHITE);
 
 		JPanel probePanel = new JPanel();
 		probePanel.setBackground(Color.WHITE);
@@ -230,8 +231,8 @@ public class ExpressionDistributionChart extends ApplicationFrame
 			renderer.setSeriesPaint(sampleIndex, Color.YELLOW);
 			renderer.setSeriesOutlinePaint(sampleIndex, Color.BLACK);
 		}
-		if (groupIndex >= 0) renderer.setSeriesPaint(groupIndex, Color.RED);
-		renderer.setSeriesPaint(allIndex, Color.BLUE);
+		if (groupIndex >= 0) renderer.setSeriesPaint(groupIndex, new Color(250, 50, 50));
+		renderer.setSeriesPaint(allIndex, new Color(50, 50, 250));
 		renderer.setShadowVisible(true);
 		renderer.setDrawBarOutline(true);
 		return chart;

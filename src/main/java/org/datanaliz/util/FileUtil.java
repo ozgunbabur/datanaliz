@@ -168,8 +168,9 @@ public class FileUtil
 //		transpose("resource/expdata/expo/stages.txt",
 //			"resource/expdata/expo/stages.txt");
 //
-		String file = Conf.DATA_FOLDER + "/CCLEPlusSKMELNormalized.txt";
+//		String file = Conf.DATA_FOLDER + "CCLEPlusSKMELNormalized.txt";
+		String file = "/home/ozgun/Desktop/GSE2109_series_matrix-3.txt";
 //		System.out.println("getLineNumber(file) = " + getLineNumber(file));
-		printLines(file, 1,3);
+		printLines(file, 1,200);
 	}
 }

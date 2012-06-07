@@ -11,7 +11,7 @@ public class QuantileNormalizerTest
 	@Test
 	public void normalizationTest() throws IOException
 	{
-		QuantileNormalizer.normalize(Conf.DATA_FOLDER + File.separator + "CCLEPlusSKMEL.txt",
-			Conf.DATA_FOLDER + File.separator + "CCLEPlusSKMELNormalized.txt");
+		QuantileNormalizer.normalize(Conf.DATA_FOLDER + "CCLEPlusSKMEL.txt",
+			Conf.DATA_FOLDER + "CCLEPlusSKMELNormalized.txt");
 	}
 }

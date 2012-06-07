@@ -20,10 +20,6 @@ public class Console
 {
 	public static void main (String[] args) throws IOException
 	{
-		String s = FileUtil.readFile(args[3]).
-			replace(",", " ").replace("|", " ");
-		System.out.println("s = " + s);
-
 		if (args.length > 0)
 		{
 			if (args[0].equals("expdist") && args.length > 2)

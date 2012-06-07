@@ -14,7 +14,7 @@ public class ExpSet
 	String[] expname;
 	String name;
 
-	Map<String, String> exp2group;
+	Map<String, String[]> exp2group;
 	Map<String, Set<String>> group2exp;
 	
 	public ExpSet()
@@ -110,7 +110,7 @@ public class ExpSet
 		return -1;
 	}
 
-	public void setSubgroups(Map<String, String> exp2group)
+	public void setSubgroups(Map<String, String[]> exp2group)
 	{
 		this.exp2group = exp2group;
 		cleanNonExistingExpInGroups();
@@ -118,9 +118,12 @@ public class ExpSet
 		group2exp = new HashMap<String, Set<String>>();
 		for (String exp : exp2group.keySet())
 		{
-			String group = exp2group.get(exp);
-			if (!group2exp.containsKey(group)) group2exp.put(group, new HashSet<String>());
-			group2exp.get(group).add(exp);
+			String[] groups = exp2group.get(exp);
+			for (String group : groups)
+			{
+				if (!group2exp.containsKey(group)) group2exp.put(group, new HashSet<String>());
+				group2exp.get(group).add(exp);
+			}
 		}
 	}
 
@@ -146,10 +149,17 @@ public class ExpSet
 		List<String> groups = new ArrayList<String>(group2exp.keySet().size());
 		for (String exp : expname)
 		{
-			String group = exp2group.get(exp);
-			if (group != null && !groups.contains(group))
+			String[] groupArr = exp2group.get(exp);
+			
+			if (groupArr != null)
 			{
-				groups.add(group);
+				for (String group : groupArr)
+				{
+					if (group != null && !groups.contains(group))
+					{
+						groups.add(group);
+					}
+				}
 			}
 		}
 		return groups;
@@ -164,10 +174,16 @@ public class ExpSet
 		List<String> elements = new ArrayList<String>(group2exp.get(group).size());
 		for (String exp : expname)
 		{
-			String gr = exp2group.get(exp);
-			if (gr != null && gr.equals(group))
+			String[] grs = exp2group.get(exp);
+			if (grs != null)
 			{
-				elements.add(exp);
+				for (String gr : grs)
+				{
+					if (gr != null && gr.equals(group))
+					{
+						elements.add(exp);
+					}
+				}
 			}
 		}
 		return elements;
