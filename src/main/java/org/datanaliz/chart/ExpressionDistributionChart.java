@@ -197,9 +197,11 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		HistogramDataset hd = new HistogramDataset();
 		hd.setType(HistogramType.FREQUENCY);
 
-		double min = Summary.min(ge.getValues());
-		double max = Summary.max(ge.getValues());
-		int bins = 20;
+//		double min = Summary.min(ge.getValues());
+//		double max = Summary.max(ge.getValues());
+		double min = 0;
+		double max = 17;
+		int bins = 34;
 
 		String sample = selectedSample();
 		if (sample != null)
@@ -260,8 +262,9 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		int total = expSet.getExpname().length;
 		String group = selectedGroup();
 		int sub = group == null ? total : expSet.getSubgroupSize(group);
-		
+
 		groupBorder.setTitle("Group -- (" + sub + "/" + total + ")");
+		this.repaint();
 	}
 
 	private void updateSamples()
