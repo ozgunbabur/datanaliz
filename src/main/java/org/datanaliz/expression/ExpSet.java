@@ -1,5 +1,12 @@
 package org.datanaliz.expression;
 
+import org.datanaliz.stat.Pearson;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -16,7 +23,7 @@ public class ExpSet
 
 	Map<String, String[]> exp2group;
 	Map<String, Set<String>> group2exp;
-	
+
 	public ExpSet()
 	{
 		id2gene = new HashMap<String, GeneExp>();
@@ -139,7 +146,12 @@ public class ExpSet
 	{
 		return exp2group != null;
 	}
-	
+
+	public boolean hasCalls()
+	{
+		return id2gene.values().iterator().next().getCall() != null;
+	}
+
 	public List<String> getSubgroups()
 	{
 		if (!hasSubgroups()) return Collections.emptyList();
@@ -215,5 +227,141 @@ public class ExpSet
 	public Set<String> getSymbols()
 	{
 		return sm2gene.keySet();
+	}
+
+	public void loadCalls(String filename)
+	{
+		try
+		{
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+
+			String line = reader.readLine();
+
+			String[] token = line.split("\t");
+
+			assert token.length == expname.length;
+
+			for (int i = 0; i < token.length; i++)
+			{
+				if (token[i].contains("_"))
+				{
+					token[i] = token[i].substring(0, token[i].indexOf("_"));
+				}
+			}
+
+			int[] expmap = getExpnameMapping(token);
+
+			for (line = reader.readLine(); line != null; line = reader.readLine())
+			{
+				String id = line.substring(0, line.indexOf("\t"));
+
+				GeneExp exp = id2gene.get(id);
+
+				if (exp == null)
+				{
+					continue;
+				}
+
+				token = line.split("\t");
+
+				Call[] call = new Call[token.length - 1];
+				for (int i = 1; i < token.length; i++)
+				{
+					if (token[i].equals("A")) call[expmap[i-1]] = Call.ABSENT;
+					else if (token[i].equals("M")) call[expmap[i-1]] = Call.MARGINAL;
+					else if (token[i].equals("P")) call[expmap[i-1]] = Call.PRESENT;
+					else System.err.println("Unknown call value = " + token[i]);
+				}
+
+				exp.setCall(call);
+			}
+
+			reader.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+		}
+	}
+
+	private int[] getExpnameMapping(String[] other)
+	{
+		assert expname.length == other.length;
+		assert new HashSet<String>(Arrays.asList(other)).size() == other.length;
+
+		List<String> list = Arrays.asList(expname);
+		int[] index = new int[other.length];
+		for (int i = 0; i < other.length; i++)
+		{
+			index[i] = list.indexOf(other[i]);
+			assert index[i] >= 0;
+		}
+		return index;
+	}
+
+	/**
+	 * Calculates the matrix of Pearson correlations of the probeset values
+	 */
+	public double[][] calcIsoformCorrelations(String symbol)
+	{
+		List<GeneExp> exps = sm2gene.get(symbol);
+
+		if (exps == null) return null;
+		if (exps.size() == 1) return new double[][]{{1D}};
+
+		int size = exps.size();
+		double[][] c = new double[size][size];
+
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				c[i][j] = (i == j ? 0 : Pearson.calcCorrelation(exps.get(i).val, exps.get(j).val));
+			}
+		}
+		return c;
+	}
+
+	public String[] getIsoformIDs(String symbol)
+	{
+		List<GeneExp> exps = sm2gene.get(symbol);
+
+		if (exps == null) return null;
+
+		String[] s = new String[exps.size()];
+
+		for (int i = 0; i < s.length; i++)
+		{
+			s[i] = exps.get(i).id;
+		}
+		return s;
+	}
+
+	private static final DecimalFormat format = new DecimalFormat("0.00");
+
+	public String getIsoformCorrelationsInString(String symbol)
+	{
+		String[] ids = getIsoformIDs(symbol);
+		if (ids == null) return null;
+
+		String s = "";
+
+		for (String id : ids)
+		{
+			s += "\t" + id;
+		}
+
+		double[][] c = calcIsoformCorrelations(symbol);
+
+		for (int i = 0; i < c.length; i++)
+		{
+			s += "\n" + ids[i];
+
+			for (int j = 0; j < c[i].length; j++)
+			{
+				s += "\t" + format.format(c[i][j]);
+			}
+		}
+		return s;
 	}
 }

@@ -2,6 +2,7 @@ package org.datanaliz.expression;
 
 import org.datanaliz.Conf;
 import org.datanaliz.util.DelimFileParser;
+import org.datanaliz.util.Download;
 
 import java.io.*;
 import java.util.Collection;
@@ -68,10 +69,10 @@ public class GEOSeries extends RemoteDataAccessor
 	{
 		for (String url : getURL())
 		{
-			if (url.startsWith(SERIES_URL_PREFIX) && !urlExists(url))
+			if (url.startsWith(SERIES_URL_PREFIX) && !Download.urlExists(url))
 			{
 				url = url.substring(0, url.lastIndexOf(".t")) + "-1.txt.gz";
-				if (urlExists(url)) return true;
+				if (Download.urlExists(url)) return true;
 			}
 		}
 		return false;
@@ -118,6 +119,7 @@ public class GEOSeries extends RemoteDataAccessor
 
 		System.out.println("Size of dataset = " + expSet.expname.length);
 		loadSubgroups();
+		loadCalls();
 	}
 
 
@@ -152,6 +154,16 @@ public class GEOSeries extends RemoteDataAccessor
 		}
 	}
 	
+	protected void loadCalls()
+	{
+		File file = new File(Conf.DATA_FOLDER + id + Conf.CALL_FILE_EXTENSION);
+
+		if (file.exists())
+		{
+			expSet.loadCalls(file.getAbsolutePath());
+		}
+	}
+
 	protected String extractPlatformID() throws IOException
 	{
 		File gseFile = new File(getFileName());

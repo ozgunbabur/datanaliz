@@ -1,5 +1,6 @@
 package org.datanaliz.chart;
 
+import org.datanaliz.expression.Call;
 import org.datanaliz.expression.ExpSet;
 import org.datanaliz.expression.GeneExp;
 import org.datanaliz.stat.Summary;
@@ -44,7 +45,7 @@ public class ExpressionDistributionChart extends ApplicationFrame
 	TitledBorder groupBorder;
 	
 	private static final String NONE = "None";
-	
+
 	/**
 	 * Constructs a new application frame.
 	 */
@@ -92,7 +93,7 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		probePanel.add(probeSetBox);
 		controlPanel.add(probePanel, BorderLayout.WEST);
 
-		if (expSet.hasSubgroups())
+		if (expSet.hasSubgroups() || expSet.hasCalls())
 		{
 			JPanel groupPanel = new JPanel(new FlowLayout());
 			groupPanel.setBackground(Color.WHITE);
@@ -101,6 +102,16 @@ public class ExpressionDistributionChart extends ApplicationFrame
 			groupPanel.setBorder(groupBorder);
 			List<String> groups = expSet.getSubgroups();
 			groups.add(0, NONE);
+
+			if (expSet.hasCalls())
+			{
+				int i = 1;
+				for (Call call : Call.values())
+				{
+					groups.add(i++, call.toString());
+				}
+			}
+
 			JComboBox groupCombo = new JComboBox();
 			groupModel = new DefaultComboBoxModel(groups.toArray());
 			groupCombo.setModel(groupModel);
@@ -213,7 +224,19 @@ public class ExpressionDistributionChart extends ApplicationFrame
 		String group = selectedGroup();
 		if (group != null)
 		{
-			hd.addSeries(group, ge.getSubset(expSet.getGroupIndex(group)), bins, min, max);
+			Call c = null;
+
+			try{c = Call.valueOf(group);
+			}catch(IllegalArgumentException e){}
+
+			if (c != null)
+			{
+				hd.addSeries(group, ge.getSubset(c), bins, min, max);
+			}
+			else
+			{
+				hd.addSeries(group, ge.getSubset(expSet.getGroupIndex(group)), bins, min, max);
+			}
 		}
 		hd.addSeries("all samples", ge.getValues(), bins, min, max);
 		JFreeChart chart = ChartFactory.createHistogram("Distribution of Expression", "expression",
@@ -261,7 +284,14 @@ public class ExpressionDistributionChart extends ApplicationFrame
 	{
 		int total = expSet.getExpname().length;
 		String group = selectedGroup();
-		int sub = group == null ? total : expSet.getSubgroupSize(group);
+
+		Call c = null;
+
+		try{c = Call.valueOf(group);
+		} catch (IllegalArgumentException e){}
+
+		int sub = group == null ? total : c != null ?
+			selectedProbeset().getSubsetSize(c) : expSet.getSubgroupSize(group);
 
 		groupBorder.setTitle("Group -- (" + sub + "/" + total + ")");
 		this.repaint();

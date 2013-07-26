@@ -18,6 +18,7 @@ public class GeneExp
 	List<String> symbols;
 
 	double[] val;
+	Call[] call;
 	
 	public static final double LOG2 = Math.log(2);
 
@@ -52,6 +53,16 @@ public class GeneExp
 	public double[] getValues()
 	{
 		return val;
+	}
+
+	public void setCall(Call[] call)
+	{
+		this.call = call;
+	}
+
+	public Call[] getCall()
+	{
+		return call;
 	}
 
 	public void addSymbol(String sym)
@@ -161,7 +172,30 @@ public class GeneExp
 		}
 		return v;
 	}
-	
+
+	public double[] getSubset(Call c)
+	{
+		double[] v = new double[getSubsetSize(c)];
+
+		int ind = 0;
+		for (int i = 0; i < val.length; i++)
+		{
+			if (call[i] == c)
+			v[ind++] = val[i];
+		}
+		return v;
+	}
+
+	public int getSubsetSize(Call c)
+	{
+		int cnt = 0;
+		for (Call cc : call)
+		{
+			if (cc == c) cnt++;
+		}
+		return cnt;
+	}
+
 	@Override
 	public String toString()
 	{

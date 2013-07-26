@@ -61,6 +61,27 @@ public class Summary
 		return total / ((x.length * (x.length + 1)) / 2);
 	}
 
+	public static double mean(double[] x, boolean[] pos)
+	{
+		if (x.length == 0) return Double.NaN;
+
+		double total = 0;
+		int cnt = 0;
+		int  i = 0;
+
+		for (double v : x)
+		{
+			if (!pos[i++]) continue;
+
+			cnt++;
+			total += v;
+		}
+
+		if (cnt == 0) return Double.NaN;
+
+		return total / cnt;
+	}
+
 	public static double mean(double[] x, int[] inds)
 	{
 		assert x != null;
@@ -154,6 +175,11 @@ public class Summary
 		return Math.sqrt(variance(x, ind));
 	}
 
+	public static double stdev(double[] x, boolean[] pos)
+	{
+		return Math.sqrt(variance(x, pos));
+	}
+
 	public static double variance(double[] x)
 	{
 		double mean = Summary.mean(x);
@@ -166,6 +192,26 @@ public class Summary
 		}
 
 		var /= x.length;
+		return var;
+	}
+
+	public static double variance(double[] x, boolean[] pos)
+	{
+		double mean = Summary.mean(x, pos);
+		double var = 0;
+		int cnt = 0;
+		int i = 0;
+
+		for (double v : x)
+		{
+			if (!pos[i++]) continue;
+
+			cnt++;
+			double term = v - mean;
+			var += term * term;
+		}
+
+		var /= cnt;
 		return var;
 	}
 

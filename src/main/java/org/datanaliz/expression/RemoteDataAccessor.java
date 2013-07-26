@@ -1,6 +1,7 @@
 package org.datanaliz.expression;
 
 import org.datanaliz.Conf;
+import org.datanaliz.util.Download;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -112,58 +113,20 @@ public abstract class RemoteDataAccessor
 	{
 		for (String urlString : urlStrings)
 		{
-			try
-			{
-				System.out.print("Downloading compressed data from " + urlString + " ... ");
-				URL url = new URL(urlString);
-				URLConnection con = url.openConnection();
+			System.out.print("Downloading compressed data from " + urlString + " ... ");
 
-				GZIPInputStream in = new GZIPInputStream(con.getInputStream());
-		
-				// Open the output file
-				OutputStream out = new FileOutputStream(filename);
-		
-				// Transfer bytes from the compressed file to the output file
-				byte[] buf = new byte[1024];
-				int len;
-				while ((len = in.read(buf)) > 0)
-				{
-					out.write(buf, 0, len);
-				}
-				in.close();
-				out.close();
-				System.out.println("ok");
-				
-				File file = new File(filename);
-				if (file.exists())
-				{
-					if (file.length() > 0) return true;
-					else if (!file.delete()) throw new RuntimeException(
-						"Cannot delete empty file " + file.getPath());
-				}
-			}
-			catch (IOException e)
+			Download.downloadAndUncompress(urlString, filename);
+
+			System.out.println("ok");
+
+			File file = new File(filename);
+			if (file.exists())
 			{
-				System.out.println("failed!");
+				if (file.length() > 0) return true;
+				else if (!file.delete()) throw new RuntimeException(
+					"Cannot delete empty file " + file.getPath());
 			}
 		}
 		return false;
-	}
-	
-	protected static boolean urlExists(String url)
-	{
-		try
-		{
-			InputStream is = new URL(url).openConnection().getInputStream();
-			return is.read(new byte[1]) > 0;
-		}
-		catch (FileNotFoundException e)
-		{
-			return false;
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
 	}
 }
